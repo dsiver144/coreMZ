@@ -4,10 +4,16 @@
 //=============================================================================================================
 /*:
  * @author dsiver144
- * @plugindesc (v1.93) Core Plugin for DSI Plugins
+ * @plugindesc (v1.94) Core Plugin for DSI Plugins
  * @target MZ
  * @help 
  * Just install this on top of any DSI Plugin to make it work.
+ * 
+ * @param autoUpdate
+ * @text Auto Update
+ * @desc Automatically check for updates and download the latest version of the plugin.
+ * @type boolean
+ * @default true
  * 
  */
 //=============================================================================================================
@@ -18,6 +24,8 @@ Imported["DSI-CoreMZ"] = true;
 //=============================================================================================================
 ESL = {};
 //=============================================================================================================
+ESL.Params = PluginManager.parameters("DSI-CoreMZ");
+ESL.autoUpdate = !ESL.Params["autoUpdate"] || ESL.Params["autoUpdate"] === "true" ? true : false;
 
 PluginManager.processParameters = function (paramObject) {
     paramObject = JsonEx.makeDeepCopy(paramObject);
@@ -79,25 +87,60 @@ ESL.readCurrentPluginVersion = function () {
     const data = fs.readFileSync(scriptPath, 'utf8');
     var scriptVersion = data.match(/@plugindesc\s*\(v(.+)\)/i);
     if (scriptVersion) {
-        console.log(`Plugin Version: ${Number(scriptVersion[1])}`);
+        console.log(`Current Version: ${Number(scriptVersion[1])}`);
         return Number(scriptVersion[1]);
     }
     return 0;
 }
 
-ESL.checkForNewerVersion = function (url) {
-    fetch("https://raw.githubusercontent.com/dsiver144/SiroMasterDemo/refs/heads/main/js/plugins/DSI-CoreMZ.js?token=GHSAT0AAAAAADBXZVB6X47GYVII3G6J4KW42ABPEEQ").then(response => {
-        if (response.ok) {
-            console.log("Checking for new version...", response.text());
-            
-            return response.text();
-        } else {
-            throw new Error('Network response was not ok.', response.statusText);
-        }
-    });
+ESL.getNewerPluginVersion = function (versionTextUrl) {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", versionTextUrl, false);
+    xhr.overrideMimeType("text/plain");
+    xhr.send(null);
+    if (xhr.status === 200) {
+        const text = xhr.responseText;
+        const version = Number(text);
+        console.log(`Online Version: ${version}`);
+        return version;
+    }
+    return 0;
 }
 
-ESL.checkForNewerVersion();
+ESL.downloadNewPlugin = function (downloadVersionUrl, savePath = "js/plugins/DSI-CoreMZ.js") {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", downloadVersionUrl, false);
+    xhr.overrideMimeType("text/plain");
+    xhr.send(null);
+    if (xhr.status === 200) {
+        const text = xhr.responseText;
+        const fs = require('fs');
+        fs.writeFileSync(savePath, text, 'utf8');
+        console.log(`Plugin downloaded to ${savePath}`);
+    } else {
+        console.error(`Failed to download plugin: ${xhr.status}`);
+    }
+}
+
+ESL.checkForNewVersion = function (versionTextUrl, downloadVersionUrl) {
+    if (!ESL.autoUpdate) {
+        return false;
+    }
+    const currentVersion = ESL.readCurrentPluginVersion();
+    const onlineVersion = ESL.getNewerPluginVersion(versionTextUrl);
+    if (currentVersion < onlineVersion) {
+        const result = prompt(`A new version is available! ${downloadVersionUrl}. Enter "OK" to download or "Cancel" to ignore.`, "OK");
+        if (result === "OK") {
+            ESL.downloadNewPlugin(downloadVersionUrl);
+            alert("Plugin downloaded. Please restart the game to apply new changes!");
+            SceneManager.exit();
+        }
+    } else {
+        console.log("✅You are using the latest version of DSI-CoreMZ!");
+    }
+}
+
+ESL.checkForNewVersion("https://raw.githubusercontent.com/dsiver144/coreMZ/refs/heads/master/version.txt", "https://raw.githubusercontent.com/dsiver144/coreMZ/refs/heads/master/DSI-CoreMZ.js");
 /**
  * Parameters Ex
  * @param {string} pluginName
