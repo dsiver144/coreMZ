@@ -1,10 +1,10 @@
 //=============================================================================================================
 // * Plugin Name  : DSI-CoreMZ.js
-// * Last Updated : 4/17/2025
+// * Last Updated : 4/19/2025
 //=============================================================================================================
 /*:
  * @author dsiver144
- * @plugindesc (v1.94) Core Plugin for DSI Plugins
+ * @plugindesc (v1.95) Core Plugin for DSI Plugins
  * @target MZ
  * @help 
  * Just install this on top of any DSI Plugin to make it work.
@@ -124,6 +124,9 @@ ESL.downloadNewPlugin = function (downloadVersionUrl, savePath = "js/plugins/DSI
 
 ESL.checkForNewVersion = function (versionTextUrl, downloadVersionUrl) {
     if (!ESL.autoUpdate) {
+        return false;
+    }
+    if (!Utils.isNwjs()) {
         return false;
     }
     const currentVersion = ESL.readCurrentPluginVersion();
