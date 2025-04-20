@@ -4,7 +4,7 @@
 //========================================================================
 /*:
  * @author sirogames
- * @plugindesc (v1.5) A utility plugin to spawn events from a template map.
+ * @plugindesc (v1.6) A utility plugin to spawn events from a template map.
  * @target MZ
  * @help 
  * ========================================================================
@@ -505,6 +505,7 @@ class EventSpawner extends ESL.Engine.GameService {
      */
     onMapExit() {
         this.clearAllClonedEvents();
+        this.clearEventCache();
         console.log("DSI-EventSpawner.js: Map exit. Clearing all custom events.");
     }
     /**
@@ -707,8 +708,6 @@ class EventSpawner extends ESL.Engine.GameService {
         $gameTemp._customEvents = [];
         for (const event of this._gameMap._events) {
             if (event instanceof Game_ClonedEvent) {
-                console.log("DSI-EventSpawner.js: Clearing cloned event:", event.getPersistanceUniqueId());
-                
                 this.despawnEvent(event);
             }
         }
@@ -717,7 +716,7 @@ class EventSpawner extends ESL.Engine.GameService {
      * Generate New Event Id
      */
     generateNewEventId() {
-        let eventId = this._gameMap._events.length;
+        let eventId = 1;
         while (this._gameMap._events[eventId]) {
             eventId++;
         }
@@ -774,7 +773,6 @@ class EventSpawner extends ESL.Engine.GameService {
      * @param {boolean} value
      */
     setClonedEventSelfSwitch(uniqueId, key, value) {
-        console.log("Set Self Switch", uniqueId, key, value);
         const data = this._persistantCustomEvents[uniqueId];
         if (!data) {
             console.warn("DSI-EventSpawner.js: No persistant event found with uniqueId:", uniqueId);
