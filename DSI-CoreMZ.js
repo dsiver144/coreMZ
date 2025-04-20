@@ -4,7 +4,7 @@
 //=============================================================================================================
 /*:
  * @author dsiver144
- * @plugindesc (v1.95) Core Plugin for DSI Plugins
+ * @plugindesc (v1.96) Core Plugin for DSI Plugins
  * @target MZ
  * @help 
  * Just install this on top of any DSI Plugin to make it work.
@@ -107,7 +107,7 @@ ESL.getNewerPluginVersion = function (versionTextUrl) {
     return 0;
 }
 
-ESL.downloadNewPlugin = function (downloadVersionUrl, savePath = "js/plugins/DSI-CoreMZ.js") {
+ESL.downloadNewPlugin = function (downloadVersionUrl, pluginPath = "js/plugins/") {
     const xhr = new XMLHttpRequest();
     xhr.open("GET", downloadVersionUrl, false);
     xhr.overrideMimeType("text/plain");
@@ -115,6 +115,8 @@ ESL.downloadNewPlugin = function (downloadVersionUrl, savePath = "js/plugins/DSI
     if (xhr.status === 200) {
         const text = xhr.responseText;
         const fs = require('fs');
+        const downloadPluginName = decodeURIComponent(downloadVersionUrl).split('/').pop();
+        const savePath = pluginPath + downloadPluginName;
         fs.writeFileSync(savePath, text, 'utf8');
         console.log(`Plugin downloaded to ${savePath}`);
     } else {
@@ -131,8 +133,9 @@ ESL.checkForNewVersion = function (versionTextUrl, downloadVersionUrl) {
     }
     const currentVersion = ESL.readCurrentPluginVersion();
     const onlineVersion = ESL.getNewerPluginVersion(versionTextUrl);
+    const downloadPluginName = decodeURIComponent(downloadVersionUrl).split('/').pop();
     if (currentVersion < onlineVersion) {
-        const result = prompt(`A new version is available! ${downloadVersionUrl}. Enter "OK" to download or "Cancel" to ignore.`, "OK");
+        const result = prompt(`A new version of [${downloadPluginName}] is available!. Enter "OK" to download or "Cancel" to ignore.`, "OK");
         if (result === "OK") {
             ESL.downloadNewPlugin(downloadVersionUrl);
             alert("Plugin downloaded. Please restart the game to apply new changes!");

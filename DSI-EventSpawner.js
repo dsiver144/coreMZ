@@ -242,6 +242,9 @@ const EventClonerParams = PluginManager.parametersEx('DSI-EventSpawner');
 if (!EventClonerParams.templateMapId) {
     throw new Error("DSI-EventSpawner.js: templateMapId param is not set. Please set it in the plugin parameters.");
 }
+
+ESL.checkForNewVersion("https://raw.githubusercontent.com/dsiver144/coreMZ/refs/heads/master/eventSpawnerVersion.txt", "https://raw.githubusercontent.com/dsiver144/coreMZ/refs/heads/master/DSI-EventSpawner.js");
+
 /** @type {rm.types.Event[]} */
 var $gameTemplateEvents = [];
 
