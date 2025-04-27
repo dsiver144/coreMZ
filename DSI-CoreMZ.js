@@ -1,10 +1,10 @@
 //=============================================================================================================
 // * Plugin Name  : DSI-CoreMZ.js
-// * Last Updated : 4/19/2025
+// * Last Updated : 4/27/2025
 //=============================================================================================================
 /*:
  * @author dsiver144
- * @plugindesc (v1.96) Core Plugin for DSI Plugins
+ * @plugindesc (v1.97) Core Plugin for DSI Plugins
  * @target MZ
  * @help 
  * Just install this on top of any DSI Plugin to make it work.
@@ -2183,6 +2183,16 @@ Spriteset_Map.prototype.removeCharacterSprite = function (character) {
         this._tilemap.removeChild(sprite);
         this._characterSprites.splice(this._characterSprites.indexOf(sprite), 1);
     }
+}
+
+var DSI_CoreMZ_Spriteset_Map_findTargetSprite = Spriteset_Map.prototype.findTargetSprite;
+Spriteset_Map.prototype.findTargetSprite = function (target) {
+    for (var sprite of Object.values(this._customMapSprites)) {
+        if (sprite.targetObject === target) {
+            return sprite;
+        }
+    }
+    return DSI_CoreMZ_Spriteset_Map_findTargetSprite.call(this, target);
 }
 //#endregion
 
