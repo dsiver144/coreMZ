@@ -1,10 +1,10 @@
 //=============================================================================================================
 // * Plugin Name  : DSI-CoreMZ.js
-// * Last Updated : 4/27/2025
+// * Last Updated : 4/28/2025
 //=============================================================================================================
 /*:
  * @author dsiver144
- * @plugindesc (v1.97) Core Plugin for DSI Plugins
+ * @plugindesc (v1.98) Core Plugin for DSI Plugins
  * @target MZ
  * @help 
  * Just install this on top of any DSI Plugin to make it work.
@@ -94,37 +94,50 @@ ESL.readCurrentPluginVersion = function () {
 }
 
 ESL.getNewerPluginVersion = function (versionTextUrl) {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", versionTextUrl, false);
-    xhr.overrideMimeType("text/plain");
-    xhr.send(null);
-    if (xhr.status === 200) {
-        const text = xhr.responseText;
-        const version = Number(text);
-        console.log(`Online Version: ${version}`);
-        return version;
-    }
-    return 0;
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", versionTextUrl);
+        xhr.overrideMimeType("text/plain");
+        xhr.onload = () => {
+            if (xhr.status === 200) {
+                const text = xhr.responseText;
+                const version = Number(text);
+                console.log(`Online Version: ${version}`);
+                resolve(version);
+            } else {
+                reject()
+            }
+        }
+        xhr.send(null);
+    });
 }
 
 ESL.downloadNewPlugin = function (downloadVersionUrl, pluginPath = "js/plugins/") {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", downloadVersionUrl, false);
-    xhr.overrideMimeType("text/plain");
-    xhr.send(null);
-    if (xhr.status === 200) {
-        const text = xhr.responseText;
-        const fs = require('fs');
-        const downloadPluginName = decodeURIComponent(downloadVersionUrl).split('/').pop();
-        const savePath = pluginPath + downloadPluginName;
-        fs.writeFileSync(savePath, text, 'utf8');
-        console.log(`Plugin downloaded to ${savePath}`);
-    } else {
-        console.error(`Failed to download plugin: ${xhr.status}`);
-    }
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", downloadVersionUrl);
+        xhr.overrideMimeType("text/plain");
+        xhr.onload = () => {
+            if (xhr.status === 200) {
+                const text = xhr.responseText;
+                const fs = require('fs');
+                const downloadPluginName = decodeURIComponent(downloadVersionUrl).split('/').pop();
+                const savePath = pluginPath + downloadPluginName;
+                fs.writeFileSync(savePath, text, 'utf8');
+                resolve(savePath);
+                console.log(`Plugin downloaded to ${savePath}`);
+            } else {
+                console.error(`Failed to download plugin: ${xhr.status}`);
+                reject()
+            }
+        }
+        xhr.send(null);
+    });
+
+
 }
 
-ESL.checkForNewVersion = function (versionTextUrl, downloadVersionUrl) {
+ESL.checkForNewVersion = async function (versionTextUrl, downloadVersionUrl) {
     if (!ESL.autoUpdate) {
         return false;
     }
@@ -132,12 +145,12 @@ ESL.checkForNewVersion = function (versionTextUrl, downloadVersionUrl) {
         return false;
     }
     const currentVersion = ESL.readCurrentPluginVersion();
-    const onlineVersion = ESL.getNewerPluginVersion(versionTextUrl);
+    const onlineVersion = await ESL.getNewerPluginVersion(versionTextUrl);
     const downloadPluginName = decodeURIComponent(downloadVersionUrl).split('/').pop();
     if (currentVersion < onlineVersion) {
         const result = prompt(`A new version of [${downloadPluginName}] is available!. Enter "OK" to download or "Cancel" to ignore.`, "OK");
         if (result === "OK") {
-            ESL.downloadNewPlugin(downloadVersionUrl);
+            await ESL.downloadNewPlugin(downloadVersionUrl);
             alert("Plugin downloaded. Please restart the game to apply new changes!");
             SceneManager.exit();
         }
