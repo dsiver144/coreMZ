@@ -793,6 +793,9 @@ class EventSpawner extends ESL.Engine.GameService {
         if ($gameMap.clearEventCache && typeof $gameMap.clearEventCache === "function") {
             $gameMap.clearEventCache();
         }
+        if ($gameMap.clearEventMapCache && typeof $gameMap.clearEventMapCache === "function") {
+            $gameMap.clearEventMapCache();
+        }
     }
 }
 /** @type {EventSpawner} */

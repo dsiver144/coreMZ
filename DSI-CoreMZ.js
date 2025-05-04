@@ -1,10 +1,10 @@
 //=============================================================================================================
 // * Plugin Name  : DSI-CoreMZ.js
-// * Last Updated : 4/28/2025
+// * Last Updated : 5/4/2025
 //=============================================================================================================
 /*:
  * @author dsiver144
- * @plugindesc (v1.98) Core Plugin for DSI Plugins
+ * @plugindesc (v1.99) Core Plugin for DSI Plugins
  * @target MZ
  * @help 
  * Just install this on top of any DSI Plugin to make it work.
@@ -2118,9 +2118,11 @@ ESL.Tilemap.removeSprite = function (sprite) {
 /**
  * Remove Sprite From Tilemap
  * @param {Sprite} key 
+ * @returns {Sprite}
  */
 ESL.Tilemap.removeSpriteByKey = function (key) {
-    ESL.Tilemap.inst.removeCustomSpriteFromTilemap(key);
+    const sprite = ESL.Tilemap.inst.removeCustomSpriteFromTilemap(key);
+    return sprite;
 }
 /**
  * Get Custom Sprite From Tilemap
@@ -2177,6 +2179,7 @@ Spriteset_Map.prototype.removeCustomSpriteFromTilemap = function (key) {
     }
     this._tilemap.removeChild(sprite);
     delete this._customMapSprites[key];
+    return sprite;
 }
 
 Spriteset_Map.prototype.getCustomSpriteFromTilemap = function (key) {
