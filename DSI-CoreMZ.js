@@ -4,7 +4,7 @@
 //=============================================================================================================
 /*:
  * @author dsiver144
- * @plugindesc (v2.00) Core Plugin for DSI Plugins
+ * @plugindesc (v2.01) Core Plugin for DSI Plugins
  * @target MZ
  * @help 
  * Just install this on top of any DSI Plugin to make it work.
@@ -170,13 +170,13 @@ PluginManager.parametersEx = function (pluginName) {
 
 var DSI_CoreMZ_PluginManager_callCommand = PluginManager.callCommand;
 PluginManager.callCommand = function (self, pluginName, commandName, args) {
-    const originalArgs = [...args];
+    const originalArgs = JsonEx.makeDeepCopy(args);
     try {
         args = this.processParameters(args);
     } catch (e) {
         console.error(`Error processing parameters for plugin ${pluginName}: Command ${commandName} ${e}`);
         args = originalArgs;
-    }
+    }    
     DSI_CoreMZ_PluginManager_callCommand.call(this, self, pluginName, commandName, args);
 };
 //=============================================================================================================
