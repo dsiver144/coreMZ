@@ -1,10 +1,10 @@
 //=============================================================================================================
 // * Plugin Name  : DSI-CoreMZ.js
-// * Last Updated : 5/4/2025
+// * Last Updated : 5/11/2025
 //=============================================================================================================
 /*:
  * @author dsiver144
- * @plugindesc (v2.01) Core Plugin for DSI Plugins
+ * @plugindesc (v2.02) Core Plugin for DSI Plugins
  * @target MZ
  * @help 
  * Just install this on top of any DSI Plugin to make it work.
@@ -1852,10 +1852,6 @@ Game_System.prototype.initCustomSaveableObjects = function () {
 }
 
 Game_System.prototype.callOnNewGameOnSaveableObjects = function () {
-    if (SceneManager._scene instanceof Scene_Boot) {
-        // Doesn't call onNewGame on boot.
-        return;
-    }
     for (let key in this) {
         const object = this[key];
         if (object instanceof ESL.SaveableObject) {
@@ -1865,10 +1861,6 @@ Game_System.prototype.callOnNewGameOnSaveableObjects = function () {
 }
 
 Game_System.prototype.callOnGameLoadedOnSaveableObjects = function () {
-    if (SceneManager._scene instanceof Scene_Boot) {
-        // Doesn't call onNewGame on boot.
-        return;
-    }
     for (let key in this) {
         const object = this[key];
         if (object instanceof ESL.SaveableObject) {
@@ -1945,8 +1937,8 @@ DataManager.loadGame = function (savefileId) {
     });
 };
 
-var DSI_CoreMZ_DataManager_createGameObjects = DataManager.createGameObjects;
-DataManager.createGameObjects = function () {
+var DSI_CoreMZ_DataManager_createGameObjects = DataManager.setupNewGame;
+DataManager.setupNewGame = function () {
     DSI_CoreMZ_DataManager_createGameObjects.call(this);
     $gameSystem.callOnNewGameOnSaveableObjects();
 }
