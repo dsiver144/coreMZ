@@ -1,10 +1,10 @@
 //=======================================================================
 // * Plugin Name  : DSI-EventSpawner.js
-// * Last Updated : 4/20/2025
+// * Last Updated : 7/2/2025
 //========================================================================
 /*:
  * @author sirogames
- * @plugindesc (v1.6) A utility plugin to spawn events from a template map.
+ * @plugindesc (v1.8) A utility plugin to spawn events from a template map.
  * @target MZ
  * @help 
  * ========================================================================
@@ -252,6 +252,7 @@ ESL.registerAssetPreloader((resolve, reject) => {
     ESL.File.loadMapDataAsync(EventClonerParams.templateMapId).then((mapData) => {
         $gameTemplateEvents = mapData.events;
         resolve(mapData);
+        DataManager.onLoad(mapData);
         console.log("✅ DSI-EventSpawner.js: Template Map data loaded successfully.", mapData.events);
     });
 });
@@ -792,9 +793,6 @@ class EventSpawner extends ESL.Engine.GameService {
     clearEventCache() {
         if ($gameMap.clearEventCache && typeof $gameMap.clearEventCache === "function") {
             $gameMap.clearEventCache();
-        }
-        if ($gameMap.clearEventMapCache && typeof $gameMap.clearEventMapCache === "function") {
-            $gameMap.clearEventMapCache();
         }
     }
 }
